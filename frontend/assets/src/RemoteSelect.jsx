@@ -16,14 +16,15 @@ export default function RemoteSelect({url, currentValue = ''}) {
         if (currentValue !== '') {
             const fetchData = async () => {
                 setIsLoading(true)
-                await Axios
-                    .get(url, {
+                try {
+                    const response = await Axios.get(url, {
                         params: {value: currentValue},
                     })
-                    .then((response) => {
-                        setSelected(response.data)
-                        setIsLoading(false)
-                    })
+                    setSelected(response.data)
+                } catch (e) {
+                } finally {
+                    setIsLoading(false)
+                }
             }
             fetchData()
         }
@@ -36,25 +37,23 @@ export default function RemoteSelect({url, currentValue = ''}) {
         const abortController = new AbortController()
         const fetchData = async () => {
             setIsLoading(true)
-            await Axios
-                .get(url, {
+            try {
+                const response = await Axios.get(url, {
                     params: {query, page},
                     signal: abortController.signal,
                 })
-                .then((response) => {
-                    setOptions(
-                        page > 1
-                            ? options.concat(response.data.options)
-                            : response.data.options
-                    )
-                    setHasNextPage(response.data.hasNextPage)
+                setOptions(
+                    page > 1
+                        ? options.concat(response.data.options)
+                        : response.data.options
+                )
+                setHasNextPage(response.data.hasNextPage)
+                setIsLoading(false)
+            } catch (e) {
+                if (!Axios.isCancel(e)) {
                     setIsLoading(false)
-                })
-                .catch((error) => {
-                    if (!Axios.isCancel(error)) {
-                        console.log(error);
-                    }
-                })
+                }
+            }
         }
         fetchData()
         return () => abortController.abort()

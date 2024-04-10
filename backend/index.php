@@ -39,10 +39,6 @@ $filteredData = $page > $totalPages
     ? []
     : array_slice($filteredData, ($page - 1) * PER_PAGE, PER_PAGE);
 
-foreach ($filteredData as $index => $item) {
-    $filteredData[$index]['label'] = $item['value'] . '. ' . $item['label'];
-}
-
 header('Content-Type: application/json');
 echo json_encode([
     'options' => array_values($filteredData),
