@@ -1,0 +1,21 @@
+version: 3
+
+vars:
+  PROJECT_NAME: react-select-infinity-scroll
+
+tasks:
+  yarn-build:
+    desc: Build Yarn container
+    cmd: docker build -t {{.PROJECT_NAME}}-yarn ./docker/yarn
+
+  yarn-cli:
+    desc: Open Yarn container shell
+    cmd: docker run --rm -it -w /app/ -u `id -u`:`id -g` -v ./frontend/assets:/app {{.PROJECT_NAME}}-yarn sh
+
+  up:
+    desc: Run PHP server
+    cmd: docker run --detach --rm -p 8080:80 -w /app/ -v ./backend:/app --name {{.PROJECT_NAME}}-php php:8.3.4-cli-alpine3.19 php -S 0.0.0.0:80 -t /app
+
+  down:
+    desc: Stop PHP server
+    cmd: docker stop {{.PROJECT_NAME}}-php
